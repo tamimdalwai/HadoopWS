@@ -1,0 +1,49 @@
+- hosts: all
+  tasks:
+    - copy: 
+        src: "/root/hadoop-1.2.1-1.x86_64.rpm"
+        dest: "/root/hadoop-1.rpm"
+
+    - copy:
+        src: "/root/jdk-8u171-linux-x64.rpm"
+        dest: "/root/jdk-1.rpm"
+     
+    - command: "rpm -i /root/jdk-1.rpm --force"
+         
+    - command: "rpm -i /root/hadoop-1.rpm --force"
+
+   
+- hosts: master
+  tasks:
+    - file:
+        state: directory
+        path: "/NN"
+
+    - copy:
+        src: "/ansible-hadoop-ws/hdfs-site-master.xml"
+        dest: "/etc/hadoop/hdfs-site.xml"
+
+    - copy:
+        src: "/ansible-hadoop-ws/core-site.xml"
+        dest: "/etc/hadoop/core-site.xml"
+
+    - shell: "echo Y|hadoop namenode -format"
+
+    - shell: "hadoop-daemon.sh start namenode"
+
+- hosts: slave
+  tasks:
+    - file:
+        state: directory
+        dest: "/DN"
+
+    - copy:
+       src: "/ansible-hadoop-ws/hdfs-site-slave.xml"
+       dest: "/etc/hadoop/hdfs-site.xml"
+
+    - copy:
+       src: "/ansible-hadoop-ws/core-site.xml"
+       dest: "/etc/hadoop/core-site.xml"
+
+    - shell: "hadoop-daemon.sh start datanode"
+
